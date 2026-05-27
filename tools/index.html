@@ -1,1 +1,152 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IT Toolbox — Hubert Zarzecki</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#1a1d23;--bg-darker:#14161b;--bg-card:#1f2229;--bg-card-hover:#262930;
+    --yellow:#e8c840;--yellow-dim:rgba(232,200,64,.12);--yellow-border:rgba(232,200,64,.25);
+    --cyan:#40c8e8;--cyan-dim:rgba(64,200,232,.10);--cyan-border:rgba(64,200,232,.20);
+    --red:#e84040;--red-dim:rgba(232,64,64,.10);--red-border:rgba(232,64,64,.20);
+    --green:#40e870;--green-dim:rgba(64,232,112,.10);--green-border:rgba(64,232,112,.20);
+    --text:#c8cad0;--text-bright:#e4e6ea;--text-muted:#7a7e88;--text-dim:#50545e;
+    --line:rgba(200,202,208,.08);--line-strong:rgba(200,202,208,.15);
+    --font-title:'Space Grotesk',sans-serif;--font-body:'Inter',sans-serif;--font-mono:'JetBrains Mono',monospace;
+  }
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    font-family:var(--font-body);background:var(--bg);color:var(--text);
+    line-height:1.65;min-height:100vh;
+    background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:60px 60px;
+  }
 
+  nav{
+    padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;
+    background:rgba(26,29,35,.92);backdrop-filter:blur(16px);
+    border-bottom:1px solid var(--line-strong);position:sticky;top:0;z-index:100;
+  }
+  .nav-logo{font-family:var(--font-mono);font-size:1rem;font-weight:600;color:var(--yellow);text-decoration:none;letter-spacing:.05em;}
+  .nav-links{display:flex;gap:2rem;list-style:none;}
+  .nav-links a{
+    color:var(--text-muted);text-decoration:none;font-family:var(--font-mono);
+    font-size:.7rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;transition:color .2s;
+  }
+  .nav-links a:hover{color:var(--cyan);}
+
+  .header{text-align:center;padding:4rem 2rem 2rem;position:relative;}
+  .header-tag{
+    display:inline-flex;align-items:center;gap:.5rem;
+    font-family:var(--font-mono);font-size:.6rem;font-weight:500;
+    color:var(--cyan);letter-spacing:.15em;text-transform:uppercase;
+    padding:.35rem .75rem;border:1px solid var(--cyan-border);
+    background:var(--cyan-dim);margin-bottom:1.25rem;
+  }
+  .header h1{
+    font-family:var(--font-title);font-size:clamp(1.8rem,3.5vw,2.8rem);
+    font-weight:700;letter-spacing:-.03em;color:var(--text-bright);margin-bottom:.5rem;
+  }
+  .header h1 .hl{color:var(--yellow);}
+  .header p{color:var(--text-muted);font-size:.9rem;}
+
+  .tools-grid{
+    max-width:880px;margin:2rem auto 4rem;padding:0 2rem;
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.75rem;
+  }
+  .tool-card{
+    background:var(--bg-card);border:1px solid var(--line);
+    padding:1.5rem;text-decoration:none;color:var(--text);
+    transition:all .25s;display:flex;flex-direction:column;gap:.6rem;
+    position:relative;overflow:hidden;
+  }
+  .tool-card::before{
+    content:'';position:absolute;top:0;left:0;width:100%;height:2px;
+    background:var(--cyan);opacity:0;transition:opacity .25s;
+  }
+  .tool-card:hover{border-color:var(--cyan-border);background:var(--bg-card-hover);}
+  .tool-card:hover::before{opacity:1;}
+
+  .tool-icon{
+    width:42px;height:42px;display:flex;align-items:center;justify-content:center;
+    font-size:1.2rem;border:1px solid;
+  }
+  .tool-icon.blue{background:var(--cyan-dim);border-color:var(--cyan-border);}
+  .tool-icon.red{background:var(--red-dim);border-color:var(--red-border);}
+  .tool-icon.green{background:var(--green-dim);border-color:var(--green-border);}
+  .tool-icon.yellow{background:var(--yellow-dim);border-color:var(--yellow-border);}
+
+  .tool-card h3{font-family:var(--font-title);font-size:.95rem;font-weight:600;color:var(--text-bright);}
+  .tool-card p{font-size:.8rem;color:var(--text-muted);line-height:1.5;margin:0;}
+  .tool-tag{
+    display:inline-block;padding:.15rem .5rem;font-family:var(--font-mono);
+    font-size:.55rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+    margin-top:auto;width:fit-content;border:1px solid;
+  }
+  .tool-tag.ready{border-color:var(--green-border);color:var(--green);background:var(--green-dim);}
+  .tool-tag.soon{border-color:var(--yellow-border);color:var(--yellow);background:var(--yellow-dim);}
+
+  .tool-card.add{
+    border-style:dashed;border-color:var(--line-strong);
+    align-items:center;justify-content:center;text-align:center;min-height:160px;cursor:default;
+  }
+  .tool-card.add:hover{transform:none;box-shadow:none;border-color:var(--line-strong);background:var(--bg-card);}
+  .tool-card.add:hover::before{opacity:0;}
+  .tool-card.add .plus{font-family:var(--font-mono);font-size:1.5rem;color:var(--text-dim);margin-bottom:.25rem;}
+
+  footer{
+    text-align:center;padding:2rem;border-top:1px solid var(--line-strong);
+    color:var(--text-dim);font-family:var(--font-mono);font-size:.6rem;letter-spacing:.08em;
+  }
+
+  @media(max-width:640px){
+    nav{padding:.75rem 1rem;}
+    .nav-links{gap:1rem;}
+    .header{padding:3rem 1.25rem 1.5rem;}
+    .tools-grid{padding:0 1.25rem;}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="../index.html" class="nav-logo">HZ://</a>
+  <ul class="nav-links">
+    <li><a href="../index.html">Wizytówka</a></li>
+    <li><a href="index.html">Toolbox</a></li>
+  </ul>
+</nav>
+
+<div class="header">
+  <div class="header-tag">SYS:PANEL_NARZĘDZI</div>
+  <h1>IT <span class="hl">Toolbox</span></h1>
+  <p>Wewnętrzne narzędzia do codziennej pracy w IT</p>
+</div>
+
+<div class="tools-grid">
+  <a href="nextcloud-generator.html" class="tool-card">
+    <div class="tool-icon blue">☁️</div>
+    <h3>Generator kont Nextcloud</h3>
+    <p>Login, hasło, link Privnote i gotowa treść maila — jedno kliknięcie</p>
+    <span class="tool-tag ready">OPERATIONAL</span>
+  </a>
+
+  <a href="password-generator.html" class="tool-card">
+    <div class="tool-icon red">🔐</div>
+    <h3>Generator haseł</h3>
+    <p>Bezpieczne hasła z wyborem długości, znaków i kolorowaniem</p>
+    <span class="tool-tag ready">OPERATIONAL</span>
+  </a>
+
+  <div class="tool-card add">
+    <div class="plus">+</div>
+    <p style="color:var(--text-dim);font-size:.75rem;">Kolejne narzędzia wkrótce</p>
+  </div>
+</div>
+
+<footer>© 2026 HUBERT ZARZECKI — IT TOOLBOX</footer>
+</body>
+</html>
