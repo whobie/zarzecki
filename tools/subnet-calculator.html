@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalkulator podsieci | IT Toolbox</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#1a1d23;--bg-card:#1f2229;--bg-card-hover:#262930;
+    --accent:#40e8da;--accent-dim:rgba(122,203,228,.233);--accent-border:rgba(14,63,78,.514);
+    --cyan:#40c8e8;--cyan-dim:rgba(64,200,232,.10);--cyan-border:rgba(64,200,232,.20);
+    --green:#40e870;--green-dim:rgba(64,232,112,.08);--green-border:rgba(64,232,112,.18);
+    --amber:#e8b040;--amber-dim:rgba(232,176,64,.08);--amber-border:rgba(232,176,64,.18);
+    --purple:#a070e8;--purple-dim:rgba(160,112,232,.08);--purple-border:rgba(160,112,232,.18);
+    --text:#c8cad0;--text-bright:#e4e6ea;--text-muted:#7a7e88;--text-dim:#50545e;
+    --line:rgba(200,202,208,.08);--line-strong:rgba(200,202,208,.15);
+    --font-title:'Space Grotesk',sans-serif;--font-body:'Inter',sans-serif;--font-mono:'JetBrains Mono',monospace;
+  }
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    font-family:var(--font-body);background:var(--bg);color:var(--text);
+    line-height:1.65;min-height:100vh;
+    background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:60px 60px;
+  }
+  nav{
+    padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;
+    background:rgba(26,29,35,.92);backdrop-filter:blur(16px);
+    border-bottom:1px solid var(--line-strong);position:sticky;top:0;z-index:100;
+  }
+  .nav-logo{font-family:var(--font-mono);font-size:.9rem;font-weight:600;color:var(--accent);text-decoration:none;letter-spacing:.05em;}
+  .nav-back{color:var(--text-muted);text-decoration:none;font-family:var(--font-mono);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;transition:color .2s;}
+  .nav-back:hover{color:var(--cyan);}
+  .container{max-width:600px;margin:0 auto;padding:2rem 1.5rem 4rem;}
+  .page-header{text-align:center;margin-bottom:2rem;}
+  .page-header .icon{font-size:2rem;margin-bottom:.5rem;}
+  .page-header h1{font-family:var(--font-title);font-size:1.5rem;font-weight:600;color:var(--text-bright);margin-bottom:.2rem;}
+  .page-header p{color:var(--text-muted);font-size:.85rem;}
+  .form-group{margin-bottom:.85rem;}
+  .form-group label{display:block;font-family:var(--font-mono);font-size:.6rem;font-weight:500;color:var(--text-dim);margin-bottom:.35rem;letter-spacing:.12em;text-transform:uppercase;}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;}
+  input[type="text"]{
+    width:100%;padding:.65rem .9rem;background:var(--bg-card);
+    border:1px solid var(--line-strong);color:var(--text-bright);
+    font-family:var(--font-mono);font-size:.9rem;transition:border-color .2s;outline:none;
+  }
+  input:focus{border-color:var(--accent);}
+  input::placeholder{color:var(--text-dim);}
+  .btn-generate{
+    width:100%;padding:.75rem;background:var(--accent);color:#14161b;border:none;
+    font-family:var(--font-mono);font-size:.75rem;font-weight:700;
+    letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .2s;margin-top:.5rem;
+  }
+  .btn-generate:hover{box-shadow:0 0 25px rgba(64,232,218,.2);transform:translateY(-1px);}
+  .results{margin-top:1.75rem;display:flex;flex-direction:column;gap:.75rem;display:none;}
+  .result-card{padding:.9rem 1.1rem;border:1px solid;position:relative;}
+  .result-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem;}
+  .result-tag{font-family:var(--font-mono);font-size:.5rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;padding:.2rem .5rem;border:1px solid;}
+  .card-main{background:var(--cyan-dim);border-color:var(--cyan-border);}
+  .card-main .result-tag{border-color:var(--cyan-border);color:var(--cyan);background:var(--cyan-dim);}
+  .card-range{background:var(--green-dim);border-color:var(--green-border);}
+  .card-range .result-tag{border-color:var(--green-border);color:var(--green);background:var(--green-dim);}
+  .card-bits{background:var(--amber-dim);border-color:var(--amber-border);}
+  .card-bits .result-tag{border-color:var(--amber-border);color:var(--amber);background:var(--amber-dim);}
+  .subnet-table{width:100%;border-collapse:collapse;}
+  .subnet-table tr{border-bottom:1px solid var(--line);}
+  .subnet-table tr:last-child{border-bottom:none;}
+  .subnet-table td{padding:.45rem 0;font-family:var(--font-mono);font-size:.82rem;}
+  .subnet-table td:first-child{color:var(--text-dim);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;width:45%;}
+  .subnet-table td:last-child{color:var(--text-bright);font-weight:500;}
+  .td-cyan td:last-child{color:var(--cyan);}
+  .td-green td:last-child{color:var(--green);}
+  .td-amber td:last-child{color:var(--amber);}
+  .btn-sm{
+    padding:.25rem .6rem;border:1px solid var(--line-strong);background:transparent;
+    font-family:var(--font-mono);font-size:.6rem;font-weight:600;
+    letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .2s;color:var(--text-muted);
+  }
+  .btn-sm:hover{border-color:var(--cyan);color:var(--cyan);}
+  .error-msg{display:none;padding:.6rem .9rem;background:rgba(232,64,64,.08);border:1px solid rgba(232,64,64,.2);color:#f07070;font-family:var(--font-mono);font-size:.75rem;margin-top:.5rem;}
+  @media(max-width:640px){nav{padding:.75rem 1rem;}.container{padding:1.5rem 1rem 3rem;}.form-row{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">HZ://TOOLBOX</a>
+  <a href="index.html" class="nav-back">← Panel</a>
+</nav>
+<div class="container">
+  <div class="page-header">
+    <div class="icon">🌐</div>
+    <h1>Kalkulator podsieci</h1>
+    <p>Wpisz adres IP i maskę — dostaniesz pełne informacje o podsieci</p>
+  </div>
+
+  <div class="form-group">
+    <div class="form-row">
+      <div>
+        <label>Adres IP</label>
+        <input type="text" id="ipInput" placeholder="192.168.1.0">
+      </div>
+      <div>
+        <label>Maska (CIDR lub subnet)</label>
+        <input type="text" id="maskInput" placeholder="/24 lub 255.255.255.0">
+      </div>
+    </div>
+  </div>
+
+  <div class="error-msg" id="errorMsg">Nieprawidłowy adres IP lub maska podsieci.</div>
+  <button class="btn-generate" id="calcBtn">▶ Oblicz podsieć</button>
+
+  <div class="results" id="results">
+
+    <div class="result-card card-main">
+      <div class="result-header">
+        <span class="result-tag">Adresacja</span>
+        <button class="btn-sm" onclick="copyTable('mainTable', this)">Kopiuj</button>
+      </div>
+      <table class="subnet-table" id="mainTable">
+        <tr class="td-cyan"><td>Adres sieci</td><td id="r-network"></td></tr>
+        <tr><td>Maska podsieci</td><td id="r-mask"></td></tr>
+        <tr><td>CIDR</td><td id="r-cidr"></td></tr>
+        <tr><td>Broadcast</td><td id="r-broadcast"></td></tr>
+        <tr><td>Klasa</td><td id="r-class"></td></tr>
+      </table>
+    </div>
+
+    <div class="result-card card-range">
+      <div class="result-header">
+        <span class="result-tag">Zakres hostów</span>
+        <button class="btn-sm" onclick="copyTable('rangeTable', this)">Kopiuj</button>
+      </div>
+      <table class="subnet-table" id="rangeTable">
+        <tr class="td-green"><td>Pierwszy host</td><td id="r-first"></td></tr>
+        <tr class="td-green"><td>Ostatni host</td><td id="r-last"></td></tr>
+        <tr><td>Dostępnych hostów</td><td id="r-hosts"></td></tr>
+      </table>
+    </div>
+
+    <div class="result-card card-bits">
+      <div class="result-header">
+        <span class="result-tag">Bity</span>
+        <button class="btn-sm" onclick="copyTable('bitsTable', this)">Kopiuj</button>
+      </div>
+      <table class="subnet-table" id="bitsTable">
+        <tr><td>Maska (binarnie)</td><td id="r-maskbin" style="font-size:.7rem;word-break:break-all;"></td></tr>
+        <tr><td>Wildcard</td><td id="r-wildcard"></td></tr>
+      </table>
+    </div>
+
+  </div>
+</div>
+<script>
+  const $=id=>document.getElementById(id);
+
+  function ipToNum(ip){
+    const p=ip.trim().split('.').map(Number);
+    if(p.length!==4||p.some(x=>isNaN(x)||x<0||x>255))return null;
+    return((p[0]<<24)|(p[1]<<16)|(p[2]<<8)|p[3])>>>0;
+  }
+  function numToIp(n){return[(n>>>24)&255,(n>>>16)&255,(n>>>8)&255,n&255].join('.');}
+  function cidrToMask(cidr){
+    const n=cidr===0?0:(0xFFFFFFFF<<(32-cidr))>>>0;
+    return numToIp(n);
+  }
+  function parseMask(val){
+    val=val.trim();
+    if(val.startsWith('/')){
+      const cidr=parseInt(val.slice(1));
+      if(isNaN(cidr)||cidr<0||cidr>32)return null;
+      return{cidr,mask:cidrToMask(cidr)};
+    }
+    const num=ipToNum(val);
+    if(num===null)return null;
+    let cidr=0,n=num;
+    while(n&0x80000000){cidr++;n=(n<<1)>>>0;}
+    return{cidr,mask:val};
+  }
+  function ipClass(firstOctet){
+    if(firstOctet<128)return'A';
+    if(firstOctet<192)return'B';
+    if(firstOctet<224)return'C';
+    if(firstOctet<240)return'D (multicast)';
+    return'E (zarezerwowana)';
+  }
+  function toBinMask(cidr){
+    return Array.from({length:4},(_,i)=>{
+      const byte=Math.min(8,Math.max(0,cidr-i*8));
+      return('0'.repeat(8-byte)+'1'.repeat(byte)).split('').join('');
+    }).join('.');
+  }
+
+  $('calcBtn').addEventListener('click',calc);
+  ['ipInput','maskInput'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter')calc();}));
+
+  function calc(){
+    const ipVal=$('ipInput').value;
+    const maskVal=$('maskInput').value;
+    const ipNum=ipToNum(ipVal);
+    const maskInfo=parseMask(maskVal);
+    const err=$('errorMsg');
+    if(ipNum===null||!maskInfo){err.style.display='block';$('results').style.display='none';return;}
+    err.style.display='none';
+    const maskNum=ipToNum(maskInfo.mask);
+    const network=(ipNum&maskNum)>>>0;
+    const broadcast=(network|(~maskNum>>>0))>>>0;
+    const hosts=maskInfo.cidr>=31?(maskInfo.cidr===32?1:2):Math.pow(2,32-maskInfo.cidr)-2;
+    const first=maskInfo.cidr>=31?network:network+1;
+    const last=maskInfo.cidr>=31?broadcast:broadcast-1;
+    const wildcard=numToIp((~maskNum)>>>0);
+    $('r-network').textContent=numToIp(network);
+    $('r-mask').textContent=maskInfo.mask;
+    $('r-cidr').textContent='/'+maskInfo.cidr;
+    $('r-broadcast').textContent=numToIp(broadcast);
+    $('r-class').textContent=ipClass(parseInt(ipVal.split('.')[0]));
+    $('r-first').textContent=numToIp(first);
+    $('r-last').textContent=numToIp(last);
+    $('r-hosts').textContent=hosts.toLocaleString('pl-PL');
+    $('r-maskbin').textContent=toBinMask(maskInfo.cidr);
+    $('r-wildcard').textContent=wildcard;
+    $('results').style.display='flex';
+  }
+
+  async function copyTable(tableId,btn){
+    const rows=[...$( tableId).querySelectorAll('tr')];
+    const text=rows.map(r=>{const cells=[...r.querySelectorAll('td')];return cells.map(c=>c.textContent.trim()).join('\t');}).join('\n');
+    try{
+      await navigator.clipboard.writeText(text);
+      const o=btn.textContent;btn.textContent='✓ OK';btn.style.borderColor='var(--green)';btn.style.color='var(--green)';
+      setTimeout(()=>{btn.textContent=o;btn.style.borderColor='';btn.style.color='';},1500);
+    }catch{}
+  }
+</script>
+</body>
+</html>
